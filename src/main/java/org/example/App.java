@@ -1,18 +1,22 @@
 package org.example;
 
-import javax.swing.*;
 import java.util.Scanner;
 
 public class App {
+
+    static Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
         startGame();
     }
 
     private static void startGame() {
+        startGame(new UserPlayer(), new BotPlayer());
+    }
+
+    private static void startGame(Player firstPlayer, Player secondPlayer) {
         // init
 
-        Scanner scan = new Scanner(System.in);
         boolean boxAvailable = false;
         byte winner = 0;
         char[] box = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -30,7 +34,7 @@ public class App {
                 break;
             }
 
-            playerMakesMove(scan, box);
+            firstPlayer.makeTurn(box);
 
             if (playerWin('X', box)) {
                 winner = 1;
@@ -44,7 +48,7 @@ public class App {
                 continue;
             }
 
-            botMakesMove(box);
+            secondPlayer.makeTurn(box);
 
             if (playerWin('O', box)) {
                 winner = 2;
@@ -86,24 +90,6 @@ public class App {
         return gameFinished;
     }
 
-    private static void playerMakesMove(Scanner scan, char[] box) {
-        byte input;
-        while (true) {
-            input = scan.nextByte();
-            //check for inbounds
-            if (input > 0 && input < 10) {
-                //check place availability
-                if (box[input - 1] == 'X' || box[input - 1] == 'O')
-                    System.out.println("That one is already in use. Enter another.");
-                else { // puts sign
-                    box[input - 1] = 'X';
-                    break;
-                }
-            } else
-                System.out.println("Invalid input. Enter again.");
-        }
-    }
-
     private static boolean playerWin(char playerSign, char[] box) {
         if (    (box[0] == playerSign && box[1] == playerSign && box[2] == playerSign) ||
                 (box[3] == playerSign && box[4] == playerSign && box[5] == playerSign) ||
@@ -139,13 +125,43 @@ public class App {
         return false;
     }
 
-    private static void botMakesMove(char[] box) {
-        byte rand;
-        while (true) {
-            rand = (byte) (Math.random() * (9 - 1 + 1) + 1);
-            if (box[rand - 1] != 'X' && box[rand - 1] != 'O') {
-                box[rand - 1] = 'O';
-                break;
+    private interface Player {
+        public void makeTurn(char[] box);
+    }
+
+    private static class UserPlayer implements Player {
+
+        @Override
+        public void makeTurn(char[] box) {
+            byte input;
+            while (true) {
+                input = scan.nextByte();
+                //check for inbounds
+                if (input > 0 && input < 10) {
+                    //check place availability
+                    if (box[input - 1] == 'X' || box[input - 1] == 'O')
+                        System.out.println("That one is already in use. Enter another.");
+                    else { // puts sign
+                        box[input - 1] = 'X';
+                        break;
+                    }
+                } else
+                    System.out.println("Invalid input. Enter again.");
+            }
+        }
+    }
+
+    private static class BotPlayer implements Player {
+
+        @Override
+        public void makeTurn(char[] box) {
+            byte rand;
+            while (true) {
+                rand = (byte) (Math.random() * (9 - 1 + 1) + 1);
+                if (box[rand - 1] != 'X' && box[rand - 1] != 'O') {
+                    box[rand - 1] = 'O';
+                    break;
+                }
             }
         }
     }
