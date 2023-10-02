@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class App {
 
     public static void main(String[] args) {
-        startGame();
+        startGame(new UserPlayer(), new BotPlayer());
     }
 
     private static void startGame() {
